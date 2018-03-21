@@ -1,8 +1,15 @@
 import json
 
 
-def load_data(filepath):
-    pass
+with open('key') as f:
+    key = f.read()
+
+
+def load_data(feature):
+    import urllib.request
+    url = 'https://apidata.mos.ru/v1/features/{0}?api_key={1}'.format(feature, key)
+    data = urllib.request.urlopen(url)
+    return json.loads(data.read().decode('utf-8'))
 
 
 def get_biggest_bar(data):
@@ -18,4 +25,4 @@ def get_closest_bar(data, longitude, latitude):
 
 
 if __name__ == '__main__':
-    pass
+    print(load_data(1796)['features'][0])
