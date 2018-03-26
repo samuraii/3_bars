@@ -57,7 +57,7 @@ def get_user_coordinates():
     except ValueError:
         print('Координаты должны быть числом, либо числом с плавающей точкой')
     else:
-        return (user_longitude, user_latitude)
+        return user_longitude, user_latitude
 
 
 def get_bar_coordinates(bar_data):
