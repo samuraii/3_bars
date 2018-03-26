@@ -61,16 +61,16 @@ def get_user_coordinates():
 
 
 def get_bar_coordinates(bar_data):
-        bar_longtitude = float(bar_data['geometry']['coordinates'][0])
-        bar_latitude = float(bar_data['geometry']['coordinates'][1])
-        return bar_longtitude, bar_latitude
+    bar_longtitude = float(bar_data['geometry']['coordinates'][0])
+    bar_latitude = float(bar_data['geometry']['coordinates'][1])
+    return bar_longtitude, bar_latitude
 
 
 def calculate_distance(user_coordinates, bar_coordinates):
-        sqr_latitude = (bar_coordinates[0] - user_coordinates[0]) ** 2
-        sqr_longtitude = (bar_coordinates[1] - user_coordinates[1]) ** 2
-        distance = math.sqrt(sqr_latitude + sqr_longtitude)
-        return distance
+    sqr_latitude = (bar_coordinates[0] - user_coordinates[0]) ** 2
+    sqr_longtitude = (bar_coordinates[1] - user_coordinates[1]) ** 2
+    distance = math.sqrt(sqr_latitude + sqr_longtitude)
+    return distance
 
 
 def get_closest_bar(bars_data):
