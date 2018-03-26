@@ -4,25 +4,25 @@ import os
 import math
 
 
-def load_data():
+def get_user_api_key():
+    try:
+        with open('api_key') as file_with_key:
+            api_key = file_with_key.read().strip()
+        return {'api_key': api_key}
+    except (FileNotFoundError, IOError):
+        print('Отсутствует файл api_key в корневой папке')
 
-    if not os.path.isfile('data'):
-        try:
-            with open('key') as f:
-                api_key = f.read()
-            api_key_param = {'api_key': api_key}
-            data_url = 'https://apidata.mos.ru/v1/features/1796'
-            data_from_url = requests.get(data_url, params=api_key_param)
-            with open('data', 'w+') as f:
-                f.write(data_from_url.text)
-            print('Данные успешно получены из ' + data_url)
-        except requests.exceptions.HTTPError:
-            print('Ошибка при получении данных из ' + data_url)
-            return
 
-    with open('data', 'r') as f:
-        bar_data = json.loads(f.read())['features']
-        return bar_data
+def fetch_data_from_api(api_url, api_key):
+    try:
+        return requests.get(api_url, params=api_key)
+    except requests.exceptions.HTTPError:
+        print('Ошибка получения данных')
+
+
+def create_bar_data_file(data_to_write):
+        with open('bar_data.json', 'w+') as data_file:
+            data_file.write(data_to_write.text)
 
 
 def get_bar_seats(bar):
@@ -37,51 +37,68 @@ def get_bar_address(bar):
     return bar['properties']['Attributes']['Address']
 
 
-def extremum_getter(bar_data, extremum_func):
-    bar_size = extremum_func(
-        bar_data,
-        key=lambda bar: get_bar_seats(bar)
-    )
-    return bar_size
+def load_bar_data(api_url, api_key):
+    with open('bar_data.json', 'r') as bars_data:
+        return json.loads(bars_data.read())['features']
 
 
-def get_closest_bar(bar_data):
+def get_biggest_bar(bars_data):
+    return max(bars_data, key=lambda bar: get_bar_seats(bar))
 
+
+def get_smallest_bar(bars_data):
+    return min(bars_data, key=lambda bar: get_bar_seats(bar))
+
+
+def get_user_coordinates():
     try:
         user_latitude = float(input('Введите вашу широту: '))
         user_longitude = float(input('Введите вашу долготу: '))
     except ValueError:
-        print('Координаты должны быть числом с плавающей точкой')
+        print('Координаты должны быть числом, либо числом с плавающей точкой')
+    else:
+        return (user_longitude, user_latitude)
 
-    closest_bar = bar_data[0]
-    previous_distance = None
 
-    for bar in bar_data:
-        bar_longtitude = float(bar['geometry']['coordinates'][0])
-        bar_latitude = float(bar['geometry']['coordinates'][1])
-        sqr_latitude = (bar_latitude - user_latitude) ** 2
-        sqr_longtitude = (bar_longtitude - user_longitude) ** 2
+def get_bar_coordinates(bar_data):
+        bar_longtitude = float(bar_data['geometry']['coordinates'][0])
+        bar_latitude = float(bar_data['geometry']['coordinates'][1])
+        
+        return (bar_longtitude, bar_latitude)
+
+
+def calculate_distance(user_coordinates, bar_coordinates):
+        sqr_latitude = (bar_coordinates[0] - user_coordinates[0]) ** 2
+        sqr_longtitude = (bar_coordinates[1] - user_coordinates[1]) ** 2
         distance = math.sqrt(sqr_latitude + sqr_longtitude)
+        return distance
 
-        if previous_distance:
-            if distance < previous_distance:
-                closest_bar = bar
 
-        previous_distance = distance
-
-    return closest_bar
+def get_closest_bar(bars_data):
+    user_coordinates = get_user_coordinates()
+    
+    return min(
+                bars_data, 
+                key=lambda bar_data: calculate_distance(
+                                user_coordinates, 
+                                get_bar_coordinates(bar_data)
+                )
+    )
 
 
 if __name__ == '__main__':
-    bar_data = load_data()
-    biggest_bar = extremum_getter(bar_data, max)
-    print('Самый большой бар называется: ' + get_bar_name(biggest_bar))
-    print('Находится по адресу: ' + get_bar_address(biggest_bar))
-    print('------------------------------------------------------------')
-    smallest_bar = extremum_getter(bar_data, min)
-    print('Самый маленький бар называется: ' + get_bar_name(smallest_bar))
-    print('Находится по адресу: ' + get_bar_address(smallest_bar))
-    print('------------------------------------------------------------')
-    closest_bar = get_closest_bar(bar_data)
-    print('Самый близкий бар называется: ' + get_bar_name(closest_bar))
-    print('Находится по адресу: ' + get_bar_address(closest_bar))
+    
+    if not os.path.isfile('bar_data.json'):
+        api_url = 'https://apidata.mos.ru/v1/features/1796'
+        api_key = get_user_api_key()
+        data_from_url = fetch_data_from_api(api_url, api_key)
+        create_bar_data_file(data_from_url)
+
+    bars_data = load_bar_data(api_url, api_key)
+    biggest_bar = get_biggest_bar(bars_data)
+    smallest_bar = get_smallest_bar(bars_data)
+    closest_bar = get_closest_bar(bars_data)
+
+    print('Самый большой бар: {}'.format(get_bar_name(biggest_bar)))
+    print('Самый маленький бар: {}'.format(get_bar_name(smallest_bar)))
+    print('Самый близкий бар: {}'.format(get_bar_name(closest_bar)))
