@@ -21,8 +21,8 @@ def fetch_data_from_api(api_url, api_key):
 
 
 def create_bar_data_file(data_to_write):
-        with open('bar_data.json', 'w+') as data_file:
-            data_file.write(data_to_write.text)
+    with open('bar_data.json', 'w+') as data_file:
+        data_file.write(data_to_write.text)
 
 
 def get_bar_seats(bar):
@@ -37,7 +37,7 @@ def get_bar_address(bar):
     return bar['properties']['Attributes']['Address']
 
 
-def load_bar_data(api_url, api_key):
+def load_bar_data():
     with open('bar_data.json', 'r') as bars_data:
         return json.loads(bars_data.read())['features']
 
@@ -63,8 +63,7 @@ def get_user_coordinates():
 def get_bar_coordinates(bar_data):
         bar_longtitude = float(bar_data['geometry']['coordinates'][0])
         bar_latitude = float(bar_data['geometry']['coordinates'][1])
-        
-        return (bar_longtitude, bar_latitude)
+        return bar_longtitude, bar_latitude
 
 
 def calculate_distance(user_coordinates, bar_coordinates):
@@ -76,7 +75,6 @@ def calculate_distance(user_coordinates, bar_coordinates):
 
 def get_closest_bar(bars_data):
     user_coordinates = get_user_coordinates()
-    
     return min(
                 bars_data, 
                 key=lambda bar_data: calculate_distance(
@@ -94,7 +92,7 @@ if __name__ == '__main__':
         data_from_url = fetch_data_from_api(api_url, api_key)
         create_bar_data_file(data_from_url)
 
-    bars_data = load_bar_data(api_url, api_key)
+    bars_data = load_bar_data()
     biggest_bar = get_biggest_bar(bars_data)
     smallest_bar = get_smallest_bar(bars_data)
     closest_bar = get_closest_bar(bars_data)
