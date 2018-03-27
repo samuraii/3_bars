@@ -17,6 +17,7 @@ def get_bar_seats(bar):
     except TypeError:
         return 'Ошибка получения количества мест в баре (Неверный тип данных).'
 
+
 def get_bar_name(bar):
     try:
         return bar['properties']['Attributes']['Name']
@@ -57,18 +58,17 @@ def calculate_distance(user_coordinates, bar_coordinates):
 def get_closest_bar(bars_data, user_coordinates):
     if user_coordinates == None:
         return 'Неверно указаны координаты'
-        
+
     return min(
-        bars_data, 
+        bars_data,
         key=lambda bar_data: calculate_distance(
-            user_coordinates, 
+            user_coordinates,
             get_bar_coordinates(bar_data)
         )
     )
 
 
 if __name__ == '__main__':
-    
     bars_data = get_data_from_file(sys.argv[1])
     user_coordinates = get_user_coordinates()
     biggest_bar = get_biggest_bar(bars_data)
