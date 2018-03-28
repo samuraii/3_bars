@@ -7,11 +7,9 @@ def get_data_from_file(path_to_file):
     try:
         with open(path_to_file) as file_data:
             return json.loads(file_data.read())['features']
-    except (FileNotFoundError, IOError):
-        print('Файл не найден.')
+    except (FileNotFoundError):
         return None
     except json.decoder.JSONDecodeError:
-        print('Файл не в формате json.')
         return None
 
 
@@ -67,18 +65,19 @@ def get_closest_bar(bars_data, user_coordinates):
 if __name__ == '__main__':
     try:
         bars_data = get_data_from_file(sys.argv[1])
-
-        if bars_data:
-            biggest_bar = get_biggest_bar(bars_data)
-            smallest_bar = get_smallest_bar(bars_data)
-            print('Самый большой бар: {}'.format(get_bar_name(biggest_bar)))
-            print('Самый маленький бар: {}'.format(get_bar_name(smallest_bar)))
-            user_coordinates = get_user_coordinates()
-            if user_coordinates is None:
-                print('Координаты должны быть рациональными числами.')
-            else:
-                closest_bar = get_closest_bar(bars_data, user_coordinates)
-                print('Самый близкий бар: {}'.format(get_bar_name(closest_bar)))
-
+        if not bars_data:
+            exit()
     except IndexError:
         print('Для корректной работы нужно передать файл.')
+        exit()
+
+    biggest_bar = get_biggest_bar(bars_data)
+    smallest_bar = get_smallest_bar(bars_data)
+    print('Самый большой бар: {}'.format(get_bar_name(biggest_bar)))
+    print('Самый маленький бар: {}'.format(get_bar_name(smallest_bar)))
+    user_coordinates = get_user_coordinates()
+    if user_coordinates is None:
+        print('Координаты должны быть рациональными числами.')
+    else:
+        closest_bar = get_closest_bar(bars_data, user_coordinates)
+        print('Самый близкий бар: {}'.format(get_bar_name(closest_bar)))
