@@ -7,41 +7,43 @@ def get_data_from_file(path_to_file):
     try:
         with open(path_to_file) as file_data:
             return json.loads(file_data.read())['features']
-    except (FileNotFoundError, IOError):
-        print('Файл не найден.')
+    except (FileNotFoundError, IOError, json.decoder.JSONDecodeError):
+        return None
 
 
 def get_bar_seats(bar):
-    try:
-        return bar['properties']['Attributes']['SeatsCount']
-    except TypeError:
-        return 'Ошибка получения количества мест в баре (Неверный тип данных).'
+    if bar is None:
+        return 'Ошибка в данных'
+    return bar['properties']['Attributes']['SeatsCount']
 
 
 def get_bar_name(bar):
-    try:
-        return bar['properties']['Attributes']['Name']
-    except TypeError:
-        return 'Ошибка получения названия бара (Неверный тип данных).'
+    if bar is None:
+        return 'Ошибка в данных'
+    return bar['properties']['Attributes']['Name']
 
 
 def get_biggest_bar(bars_data):
-    return max(bars_data, key=lambda bar: get_bar_seats(bar))
+    if bars_data is None:
+        return 'Проблема с данными. Неверный формат.'
+    else:
+        return max(bars_data, key=lambda bar: get_bar_seats(bar))
 
 
 def get_smallest_bar(bars_data):
-    return min(bars_data, key=lambda bar: get_bar_seats(bar))
+    if bars_data is None:
+        return 'Проблема с данными. Неверный формат.'
+    else:
+        return min(bars_data, key=lambda bar: get_bar_seats(bar))
 
 
 def get_user_coordinates():
     try:
         user_latitude = float(input('Введите вашу широту: '))
         user_longitude = float(input('Введите вашу долготу: '))
-    except ValueError:
-        print('Обе координаты должны быть вещественными числами')
-        return None
-    else:
         return user_longitude, user_latitude
+    except ValueError:
+        return None
 
 
 def get_bar_coordinates(bar_data):
@@ -56,8 +58,8 @@ def calculate_distance(user_coordinates, bar_coordinates):
 
 
 def get_closest_bar(bars_data, user_coordinates):
-    if user_coordinates == None:
-        return 'Неверно указаны координаты'
+    if bars_data is None or user_coordinates is None:
+        return None
 
     return min(
         bars_data,
@@ -70,11 +72,16 @@ def get_closest_bar(bars_data, user_coordinates):
 
 if __name__ == '__main__':
     bars_data = get_data_from_file(sys.argv[1])
-    user_coordinates = get_user_coordinates()
-    biggest_bar = get_biggest_bar(bars_data)
-    smallest_bar = get_smallest_bar(bars_data)
-    closest_bar = get_closest_bar(bars_data, user_coordinates)
-
-    print('Самый большой бар: {}'.format(get_bar_name(biggest_bar)))
-    print('Самый маленький бар: {}'.format(get_bar_name(smallest_bar)))
-    print('Самый близкий бар: {}'.format(get_bar_name(closest_bar)))
+    if bars_data is None:
+        print('Ошибка чтения файла с данными')
+    else:
+        biggest_bar = get_biggest_bar(bars_data)
+        smallest_bar = get_smallest_bar(bars_data)
+        print('Самый большой бар: {}'.format(get_bar_name(biggest_bar)))
+        print('Самый маленький бар: {}'.format(get_bar_name(smallest_bar)))
+        user_coordinates = get_user_coordinates()
+        if user_coordinates is None:
+            print('Координаты должны быть вещественными числами.')
+        else:
+            closest_bar = get_closest_bar(bars_data, user_coordinates)
+            print('Самый близкий бар: {}'.format(get_bar_name(closest_bar)))
