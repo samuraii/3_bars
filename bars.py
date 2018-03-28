@@ -24,11 +24,11 @@ def get_bar_name(bar):
 
 
 def get_biggest_bar(bars_data):
-        return max(bars_data, key=lambda bar: get_bar_seats(bar))
+    return max(bars_data, key=lambda bar: get_bar_seats(bar))
 
 
 def get_smallest_bar(bars_data):
-        return min(bars_data, key=lambda bar: get_bar_seats(bar))
+    return min(bars_data, key=lambda bar: get_bar_seats(bar))
 
 
 def get_user_coordinates():
