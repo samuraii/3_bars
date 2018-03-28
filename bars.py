@@ -7,33 +7,27 @@ def get_data_from_file(path_to_file):
     try:
         with open(path_to_file) as file_data:
             return json.loads(file_data.read())['features']
-    except (FileNotFoundError, IOError, json.decoder.JSONDecodeError):
+    except (FileNotFoundError, IOError):
+        print('Файл не найден.')
+        return None
+    except json.decoder.JSONDecodeError:
+        print('Файл не в формате json.')
         return None
 
 
 def get_bar_seats(bar):
-    if bar is None:
-        return 'Ошибка в данных'
     return bar['properties']['Attributes']['SeatsCount']
 
 
 def get_bar_name(bar):
-    if bar is None:
-        return 'Ошибка в данных'
     return bar['properties']['Attributes']['Name']
 
 
 def get_biggest_bar(bars_data):
-    if bars_data is None:
-        return 'Проблема с данными. Неверный формат.'
-    else:
         return max(bars_data, key=lambda bar: get_bar_seats(bar))
 
 
 def get_smallest_bar(bars_data):
-    if bars_data is None:
-        return 'Проблема с данными. Неверный формат.'
-    else:
         return min(bars_data, key=lambda bar: get_bar_seats(bar))
 
 
@@ -71,17 +65,20 @@ def get_closest_bar(bars_data, user_coordinates):
 
 
 if __name__ == '__main__':
-    bars_data = get_data_from_file(sys.argv[1])
-    if bars_data is None:
-        print('Ошибка чтения файла с данными')
-    else:
-        biggest_bar = get_biggest_bar(bars_data)
-        smallest_bar = get_smallest_bar(bars_data)
-        print('Самый большой бар: {}'.format(get_bar_name(biggest_bar)))
-        print('Самый маленький бар: {}'.format(get_bar_name(smallest_bar)))
-        user_coordinates = get_user_coordinates()
-        if user_coordinates is None:
-            print('Координаты должны быть вещественными числами.')
-        else:
-            closest_bar = get_closest_bar(bars_data, user_coordinates)
-            print('Самый близкий бар: {}'.format(get_bar_name(closest_bar)))
+    try:
+        bars_data = get_data_from_file(sys.argv[1])
+
+        if bars_data:
+            biggest_bar = get_biggest_bar(bars_data)
+            smallest_bar = get_smallest_bar(bars_data)
+            print('Самый большой бар: {}'.format(get_bar_name(biggest_bar)))
+            print('Самый маленький бар: {}'.format(get_bar_name(smallest_bar)))
+            user_coordinates = get_user_coordinates()
+            if user_coordinates is None:
+                print('Координаты должны быть рациональными числами.')
+            else:
+                closest_bar = get_closest_bar(bars_data, user_coordinates)
+                print('Самый близкий бар: {}'.format(get_bar_name(closest_bar)))
+
+    except IndexError:
+        print('Для корректной работы нужно передать файл.')
