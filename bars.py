@@ -8,7 +8,7 @@ def get_data_from_file(path_to_file):
         with open(path_to_file) as file_data:
             return json.loads(file_data.read())['features']
     except json.decoder.JSONDecodeError:
-        exit('Не получается распарсить. Там точно валидный json?')
+        return None
 
 
 def get_bar_seats(bar):
@@ -80,8 +80,8 @@ if __name__ == '__main__':
     except (FileNotFoundError):
         exit('Не могу найти такой файл.')
 
-
     print('Самый большой бар: {}'.format(get_biggest_bar_name(bars_data)))
     print('Самый маленький бар: {}'.format(get_smallest_bar_name(bars_data)))
     user_coordinates = get_user_coordinates()
-    print('Самый близкий бар: {}'.format(get_closest_bar_name(bars_data, user_coordinates)))
+    closest_bar = get_closest_bar_name(bars_data, user_coordinates)
+    print('Самый близкий бар: {}'.format(closest_bar))
