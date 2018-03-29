@@ -4,13 +4,8 @@ import math
 
 
 def get_data_from_file(path_to_file):
-    try:
-        with open(path_to_file) as file_data:
-            return json.loads(file_data.read())['features']
-    except (FileNotFoundError):
-        return None
-    except json.decoder.JSONDecodeError:
-        return None
+    with open(path_to_file) as file_data:
+        return json.loads(file_data.read())['features']
 
 
 def get_bar_seats(bar):
@@ -65,11 +60,12 @@ def get_closest_bar(bars_data, user_coordinates):
 if __name__ == '__main__':
     try:
         bars_data = get_data_from_file(sys.argv[1])
-        if not bars_data:
-            exit()
     except IndexError:
-        print('Для корректной работы нужно передать файл.')
-        exit()
+        exit('Для корректной работы нужно передать скрипту файл.')
+    except (FileNotFoundError):
+        exit('Не могу найти такой файл.')
+    except json.decoder.JSONDecodeError:
+        exit('Не получается распарсить. Там точно валидный json?')
 
     biggest_bar = get_biggest_bar(bars_data)
     smallest_bar = get_smallest_bar(bars_data)
