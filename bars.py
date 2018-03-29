@@ -67,13 +67,10 @@ if __name__ == '__main__':
     except json.decoder.JSONDecodeError:
         exit('Не получается распарсить. Там точно валидный json?')
 
-    biggest_bar = get_biggest_bar(bars_data)
-    smallest_bar = get_smallest_bar(bars_data)
-    print('Самый большой бар: {}'.format(get_bar_name(biggest_bar)))
-    print('Самый маленький бар: {}'.format(get_bar_name(smallest_bar)))
+    print('Самый большой бар: {}'.format(get_bar_name(get_biggest_bar(bars_data))))
+    print('Самый маленький бар: {}'.format(get_bar_name(get_smallest_bar(bars_data))))
     user_coordinates = get_user_coordinates()
-    if user_coordinates is None:
-        print('Координаты должны быть рациональными числами.')
+    if user_coordinates:
+        print('Самый близкий бар: {}'.format(get_bar_name(get_closest_bar(bars_data, user_coordinates))))
     else:
-        closest_bar = get_closest_bar(bars_data, user_coordinates)
-        print('Самый близкий бар: {}'.format(get_bar_name(closest_bar)))
+        exit('Координаты должны быть рациональными числами')
