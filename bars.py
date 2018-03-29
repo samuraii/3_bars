@@ -65,10 +65,10 @@ if __name__ == '__main__':
         bars_data = get_data_from_file(sys.argv[1])
     except IndexError:
         exit('Для корректной работы нужно передать скрипту файл.')
-    except (FileNotFoundError):
+    except FileNotFoundError:
         exit('Не могу найти такой файл.')
 
-    if bars_data is None:
+    try:
         biggest_bar = get_biggest_bar(bars_data)
         smallest_bar = get_smallest_bar(bars_data)
         print('Самый большой бар: {}'.format(get_bar_name(biggest_bar)))
@@ -76,5 +76,5 @@ if __name__ == '__main__':
         user_coordinates = get_user_coordinates()
         closest_bar = get_closest_bar(bars_data, user_coordinates)
         print('Самый близкий бар: {}'.format(get_bar_name(closest_bar)))
-    else:
+    except TypeError:
         exit('Содержимое файла не валидно, проверь что там.')
