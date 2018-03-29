@@ -4,8 +4,11 @@ import math
 
 
 def get_data_from_file(path_to_file):
-    with open(path_to_file) as file_data:
-        return json.loads(file_data.read())['features']
+    try:
+        with open(path_to_file) as file_data:
+            return json.loads(file_data.read())['features']
+    except json.decoder.JSONDecodeError:
+        exit('Не получается распарсить. Там точно валидный json?')
 
 
 def get_bar_seats(bar):
@@ -20,8 +23,16 @@ def get_biggest_bar(bars_data):
     return max(bars_data, key=lambda bar: get_bar_seats(bar))
 
 
+def get_biggest_bar_name(bars_data):
+    return get_bar_name(get_biggest_bar(bars_data))
+
+
 def get_smallest_bar(bars_data):
     return min(bars_data, key=lambda bar: get_bar_seats(bar))
+
+
+def get_smallest_bar_name(bars_data):
+    return get_bar_name(get_smallest_bar(bars_data))
 
 
 def get_user_coordinates():
@@ -57,6 +68,10 @@ def get_closest_bar(bars_data, user_coordinates):
     )
 
 
+def get_closest_bar_name(bars_data, user_coordinates):
+    return get_bar_name(get_closest_bar(bars_data, user_coordinates))
+
+
 if __name__ == '__main__':
     try:
         bars_data = get_data_from_file(sys.argv[1])
@@ -64,13 +79,9 @@ if __name__ == '__main__':
         exit('Для корректной работы нужно передать скрипту файл.')
     except (FileNotFoundError):
         exit('Не могу найти такой файл.')
-    except json.decoder.JSONDecodeError:
-        exit('Не получается распарсить. Там точно валидный json?')
 
-    print('Самый большой бар: {}'.format(get_bar_name(get_biggest_bar(bars_data))))
-    print('Самый маленький бар: {}'.format(get_bar_name(get_smallest_bar(bars_data))))
+
+    print('Самый большой бар: {}'.format(get_biggest_bar_name(bars_data)))
+    print('Самый маленький бар: {}'.format(get_smallest_bar_name(bars_data)))
     user_coordinates = get_user_coordinates()
-    if user_coordinates:
-        print('Самый близкий бар: {}'.format(get_bar_name(get_closest_bar(bars_data, user_coordinates))))
-    else:
-        exit('Координаты должны быть рациональными числами')
+    print('Самый близкий бар: {}'.format(get_closest_bar_name(bars_data, user_coordinates)))
