@@ -80,8 +80,11 @@ if __name__ == '__main__':
     except (FileNotFoundError):
         exit('Не могу найти такой файл.')
 
-    print('Самый большой бар: {}'.format(get_biggest_bar_name(bars_data)))
-    print('Самый маленький бар: {}'.format(get_smallest_bar_name(bars_data)))
-    user_coordinates = get_user_coordinates()
-    closest_bar = get_closest_bar_name(bars_data, user_coordinates)
-    print('Самый близкий бар: {}'.format(closest_bar))
+    if bars_data:
+        print('Самый большой бар: {}'.format(get_biggest_bar_name(bars_data)))
+        print('Самый мелкий бар: {}'.format(get_smallest_bar_name(bars_data)))
+        user_coordinates = get_user_coordinates()
+        closest_bar = get_closest_bar_name(bars_data, user_coordinates)
+        print('Самый близкий бар: {}'.format(closest_bar))
+    else:
+        exit('Содержимое файла не валидно, проверь что там.')
