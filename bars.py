@@ -23,16 +23,8 @@ def get_biggest_bar(bars_data):
     return max(bars_data, key=lambda bar: get_bar_seats(bar))
 
 
-def get_biggest_bar_name(bars_data):
-    return get_bar_name(get_biggest_bar(bars_data))
-
-
 def get_smallest_bar(bars_data):
     return min(bars_data, key=lambda bar: get_bar_seats(bar))
-
-
-def get_smallest_bar_name(bars_data):
-    return get_bar_name(get_smallest_bar(bars_data))
 
 
 def get_user_coordinates():
@@ -68,10 +60,6 @@ def get_closest_bar(bars_data, user_coordinates):
     )
 
 
-def get_closest_bar_name(bars_data, user_coordinates):
-    return get_bar_name(get_closest_bar(bars_data, user_coordinates))
-
-
 if __name__ == '__main__':
     try:
         bars_data = get_data_from_file(sys.argv[1])
@@ -80,11 +68,13 @@ if __name__ == '__main__':
     except (FileNotFoundError):
         exit('Не могу найти такой файл.')
 
-    if bars_data:
-        print('Самый большой бар: {}'.format(get_biggest_bar_name(bars_data)))
-        print('Самый мелкий бар: {}'.format(get_smallest_bar_name(bars_data)))
+    if bars_data is None:
+        biggest_bar = get_biggest_bar(bars_data)
+        smallest_bar = get_smallest_bar(bars_data)
+        print('Самый большой бар: {}'.format(get_bar_name(biggest_bar)))
+        print('Самый мелкий бар: {}'.format(get_bar_name(bars_data)))
         user_coordinates = get_user_coordinates()
-        closest_bar = get_closest_bar_name(bars_data, user_coordinates)
-        print('Самый близкий бар: {}'.format(closest_bar))
+        closest_bar = get_closest_bar(bars_data, user_coordinates)
+        print('Самый близкий бар: {}'.format(get_bar_name(closest_bar)))
     else:
         exit('Содержимое файла не валидно, проверь что там.')
